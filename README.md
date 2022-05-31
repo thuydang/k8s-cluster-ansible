@@ -58,7 +58,7 @@ Make sure br_netfilter kernel module is loaded. Auto loaded in playbook.
 
 #### Step 3 - Test the setup
 
-     ssh admin@c2-master-01 -i ../keys/id_rsa
+     ssh admin@master -i ../keys/id_rsa
      kubectl get nodes -o wide
 
 
