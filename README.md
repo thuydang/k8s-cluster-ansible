@@ -1,4 +1,4 @@
-# IIoT k8s-controller
+# k8s-controller
 
 
 ## Cloud lab 
