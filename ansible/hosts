@@ -1,0 +1,18 @@
+[ansible-controller]
+localhost   ansible_connection=local
+
+[k8s-01:children] # all is reserved for all hosts including localhost.
+masters
+workers
+
+[masters]
+master		ansible_host=xx4.36.147.xx   ansible_user=root ansible_ssh_private_key_file=../keys/id_rsa ansible_ssh_pass=e3ZHZTNv8
+
+[workers]
+node01 		ansible_host=89.58.6.xx      ansible_user=root ansible_ssh_private_key_file=../keys/id_rsa ansible_ssh_pass=kzk5Ry3qxY
+
+
+[others]
+
+oworker 	ansible_host=20.1.249.xx    ansible_user=root ansible_ssh_private_key_file=../keys/id_rsa ansible_ssh_pass=2H6DXyTvFp6
+omaster		ansible_host=20.1.236.xx   ansible_user=root ansible_ssh_private_key_file=../keys/id_rsa ansible_ssh_pass=d1aYKVQtQhE

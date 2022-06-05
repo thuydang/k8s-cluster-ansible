@@ -1,0 +1,25 @@
+---
+- hosts: "{{ variable_hosts | default('k8s-strato') }}"
+  become: true
+  tasks:
+    - name: Set ip forwarding on in /proc and verify token value with the sysctl command
+      sysctl:
+        name: "{{ item }}"
+        value: '1'
+        sysctl_set: yes
+        state: present
+        reload: yes
+      with_items:
+        - net.bridge.bridge-nf-call-iptables
+        - net.bridge.bridge-nf-call-arptables
+        - net.bridge.bridge-nf-call-ip6tables
+    - name: runit
+      become_user: admin
+      blockinfile:
+        path: ~/.bashrc
+        backup: yes
+        block: |
+          bind '"\e[A": history-search-backward'
+          bind '"\e[B": history-search-forward'
+        
+

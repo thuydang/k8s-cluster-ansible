@@ -1,0 +1,120 @@
+---
+- hosts: "{{ variable_hosts | default('k8s-all') }}"
+  become: true
+  tasks:
+    - name: root - make direcotry
+      file:
+        path: "/root/.ssh"
+        state: directory
+    - name: root - copy root keys
+      copy: 
+        src: ../../keys/{{ item }}
+        dest: /root/.ssh/{{ item }}
+        owner: root
+        mode: 0600
+        force: yes
+      with_items:
+        - id_rsa
+        - id_rsa.pub
+    - name: root - set auth-keys.
+      authorized_key: # copy local pubkey to remote host.
+        user: root
+        key: "{{ lookup('file', item) }}"
+        state: present
+      with_fileglob: "../../keys/*.pub"
+### admin user
+    - name: create user admin
+      user:
+        name: admin
+        groups: sudo
+        append: yes
+        system: yes
+        shell: /bin/bash
+        state: present
+    - name: admin - make ssh direcotry
+      file:
+        path: "/home/admin/.ssh"
+        state: directory
+    - name: admin - copy keys
+      copy: 
+        src: ../../keys/{{ item }}
+        dest: /home/admin/.ssh/{{ item }}
+        owner: admin
+        mode: 0600
+        force: yes
+      with_items:
+        - id_rsa
+        - id_rsa.pub
+    - name: admin - set auth-keys.
+      authorized_key: # copy local pubkey to remote host.
+        user: admin
+        key: "{{ lookup('file', item) }}"
+        state: present
+      with_fileglob: "../../keys/*.pub"
+    - name: sudo without password for wheel group
+      copy:
+        content: '%sudo ALL=(ALL:ALL) NOPASSWD:ALL'
+        dest: /etc/sudoers.d/wheel_nopasswd
+        mode: 0440
+    - name: admin - copy firewall sh
+      copy: 
+        src: ../../util/{{ item }}
+        dest: /home/admin/{{ item }}
+        owner: admin
+        mode: 0600
+        force: yes
+      with_items:
+        - firewall.sh
+        - flush-iptables.sh
+    - name: install security tools
+      apt:
+        name: "{{item}}"
+        state: present
+      loop:
+        - fail2ban
+    - name: config fail2ban
+      copy:
+        src: ./files/jail.local
+        dest: /etc/fail2ban/jail.local
+        owner: root
+        group: root
+        mode: 0644
+    - name: start and enable fail2ban
+      service:
+        name: fail2ban
+        state: started
+        enabled: true
+      
+    - name: Load required kernel modules
+      modprobe:
+        name: "{{ item }}"
+      with_items:
+        - overlay
+        - br_netfilter
+    - name: Set ip forwarding on in /proc and verify token value with the sysctl command
+      sysctl:
+        name: "{{ item }}"
+        value: '1'
+        sysctl_set: yes
+        state: present
+        reload: yes
+      with_items:
+        - net.ipv4.ip_forward
+        - net.bridge.bridge-nf-call-iptables
+        - net.bridge.bridge-nf-call-arptables
+        - net.bridge.bridge-nf-call-ip6tables
+    - name: runit
+      become_user: admin
+      blockinfile:
+        path: ~/.bashrc
+        backup: yes
+        block: |
+          bind '"\e[A": history-search-backward'
+          bind '"\e[B": history-search-forward'
+ 
+    - name: set bash autocompletion
+      become_user: admin
+      lineinfile:
+        dest: ~/.bashrc
+        line: "source <(kubectl completion bash)"
+        backup: yes

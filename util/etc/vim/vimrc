@@ -1,0 +1,212 @@
+" ****************** INITIALIZE *******************
+" When started as "evim", evim.vim will already have done these settings.
+if v:progname =~? "evim"
+  finish
+endif
+
+" Use Vim settings, rather than Vi settings (much better!).
+" This must be first, because it changes other options as a side effect.
+" Avoid side effects when it was already reset.
+if &compatible
+  set nocompatible
+endif
+
+" When the +eval feature is missing, the set command above will be skipped.
+" Use a trick to reset compatible only when the +eval feature is missing.
+silent! while 0
+  set nocompatible
+silent! endwhile
+
+" Allow backspacing over everything in insert mode.
+set backspace=indent,eol,start
+
+filetype plugin indent on " Automatically detect file types.
+syntax on " syntax highlighting
+ 
+" ****************** VISUAL *******************
+"color ir_black " load a colorscheme
+"color evening " load a colorscheme
+"color 256-jungle " load a colorscheme
+"color BlackSea
+"color af " load a colorscheme
+ 
+" set cursorline " highlight current line
+" hi cursorline guibg=#333333 " highlight bg color of current line
+hi CursorColumn guibg=#333333 " highlight cursor
+ 
+if has('cmdline_info')
+set ruler " show the ruler
+set rulerformat=%30(%=\:b%n%y%m%r%w\ %l,%c%V\ %P%) " a ruler on steroids
+set showcmd " show partial commands in status line and
+" selected characters/lines in visual mode
+endif
+ 
+if has('statusline')
+set laststatus=1 " show statusline only if there are > 1 windows
+set statusline=%<%f\ %=\:\b%n%y%m%r%w\ %l,%c%V\ %P " a statusline, also on steroids
+endif
+ 
+" GVIM- (here instead of .gvimrc)
+if has('gui_running')
+set guioptions-=T " remove the toolbar
+set lines=40 " 40 lines of text instead of 24,
+endif
+ 
+" ****************** ENVIRONMENT *******************
+set backspace=indent,eol,start " backspace for dummys
+set showmatch " show matching brackets/parenthesis
+set wildmenu " show list instead of just completing
+set wildmode=list:longest,full " comand <Tab> completion, list matches, then longest common part, then all.
+set shortmess+=filmnrxoOtT " abbrev. of messages (avoids 'hit enter')
+set showmode " display the current mode
+" set spell " spell checking on
+set nu " Line numbers on
+set tabpagemax=15 " only show 15 tabs
+set incsearch " find as you type search
+set hlsearch " highlight search terms
+set winminheight=0 " windows can be 0 line high
+set autowrite
+set whichwrap=b,s,h,l,<,>,[,] " backspace and cursor keys wrap to
+" set ignorecase " case insensitive search
+set smartcase " case sensitive when uc present
+set backup " backups are nice
+set backupdir=~/.vim/tmp,~/tmp,/tmp,."}}}
+set scrolljump=5 " lines to scroll when cursor leaves screen
+set scrolloff=3 " minimum lines to keep above and below cursor
+"set foldenable " auto fold code
+"set foldmethod=marker " type of folding
+"set foldclose=all
+"set writebackup
+ 
+" ****************** FORMATTING *******************
+" Formatting
+"set nowrap " wrap long lines
+set wrap
+set cindent
+set autoindent " indent at the same level of the previous line
+set shiftwidth=2 " use indents of 2 spaces
+"set noexpandtab " tabs are tabs, not spaces
+"set tabstop=2 " an indentation every 2 columns
+set tabstop=2 shiftwidth=2 expandtab
+"set matchpairs+=<:> " match, to be used with %
+set pastetoggle=<F12> " pastetoggle (sane indentation on pastes)
+set comments=sl:/*,mb:*,elx:*/ " auto format comment blocks
+ 
+" ****************** GENERAL SHORTCUTS *******************
+map <C-L> <C-W>_
+map <C-J> <C-W>j<C-W>_
+map <C-K> <C-W>k<C-W>_
+map <S-H> gT
+map <S-L> gt
+ 
+" Stupid shift key fixes
+map:W :w
+map:WQ :wq
+map:wQ :wq
+map:Q :q
+ 
+autocmd BufEnter * lcd %:p:h " change directory the current file's
+"autocmd BufWritePost .vimrc source %
+ 
+"search visually selected
+vnoremap // y/<C-R>"<CR>
+
+" ****************** CODING *******************
+ 
+if has("autocmd") && exists("+omnifunc")
+autocmd Filetype *
+\if &omnifunc == "" |
+\setlocal omnifunc=syntaxcomplete#Complete |
+\endif
+endif
+ 
+set completeopt+=menuone " show preview of function prototype
+
+autocmd Filetype yaml setlocal tabstop=2 ai colorcolumn=1,3,5,7,9,80
+
+" ****************** PLUGINS *******************
+:map <C-F10> <Esc>:vsp<CR>:VTree<CR>
+" map Control + F10 to Vtree
+ 
+let g:checksyntax_auto = 0
+" ****************** OTHERS *******************
+"set mouse=a
+set spelllang=en
+set spellfile=/home/dang/data/mydirectory/mywork/dailabor/02--stationary/dictionaries/vim_tex/en.utf-8.add
+"setlocal spell spelllang=en_us
+
+"activate spell for filetypes
+"autocmd BufRead,BufNewFile *.md setlocal spell
+"autocmd BufRead,BufNewFile *.tex setlocal spell
+set nospell
+
+" ****************** JAVA DEVELOPING **********
+set complete=.,w,b,u,t,i
+set foldmethod=indent
+set foldnestmax=10
+set nofoldenable
+set foldlevel=2
+
+" ****************** PYTHON DEVELOPING **********
+" miniBufExpl
+"let g:miniBufExplMapWindowNavVim = 1
+"let g:miniBufExplMapWindowNavArrows = 1
+"let g:miniBufExplMapCTabSwitchBufs = 1
+"let g:miniBufExplModSelTarget = 1
+
+" Taglist & exuberant ctag
+let Tlist_Ctags_Cmd='/usr/bin/ctags'
+let Tlist_WinWidth = 40
+" toggle Tlist window
+map <F4> :TlistToggle<cr>
+" ****  code completion
+" *** Python
+"autocmd FileType python set omnifunc=pythoncomplete#Complete
+
+" *** cpp omnicppcomplete
+autocmd FileType cpp set omnifunc=ccomplete#Complete
+set nocp
+filetype plugin on
+" index current file
+"map <F8> :!/usr/bin/ctags -R --c++-kinds=+p --fields=+iaS --extra=+q --languages==C++ .<CR>
+map <F8> :!/usr/bin/ctags -R --c++-kinds=+p --fields=+iaS --extra=+q .<CR>
+
+" configure tags - add additional tags here or comment out not-used ones
+set tags+=~/.vim/tags/cpp/tags
+"set tags+=~/.vim/tags/cpp/gl
+"set tags+=~/.vim/tags/cpp/sdl
+"set tags+=~/.vim/tags/cpp/qt4
+
+" OmniCppComplete
+let OmniCpp_NamespaceSearch = 1
+let OmniCpp_GlobalScopeSearch = 1
+let OmniCpp_ShowAccess = 1
+let OmniCpp_ShowPrototypeInAbbr = 1 " show function parameters
+let OmniCpp_MayCompleteDot = 1 " autocomplete after .
+let OmniCpp_MayCompleteArrow = 1 " autocomplete after ->
+let OmniCpp_MayCompleteScope = 1 " autocomplete after ::
+let OmniCpp_DefaultNamespaces = ["std", "_GLIBCXX_STD"]
+" automatically open and close the popup menu / preview window
+au CursorMovedI,InsertLeave * if pumvisible() == 0|silent! pclose|endif
+set completeopt=menuone,menu,longest,preview
+
+" auto indent xml (gg=G, =G)
+"au FileType xml setlocal equalprg=xmllint\ --format\ --recover\ -\ 2>/dev/null
+"au FileType xml exe ":silent 1,$!tidy --input-xml true --indent yes 2>/dev/null"
+
+" VIM-PLUG plugin maangement
+" Specify a directory for plugins
+" - For Neovim: ~/.local/share/nvim/plugged
+" - Avoid using standard Vim directory names like 'plugin'
+"call plug#begin('~/.vim/plugged')
+" Make sure you use single quotes
+
+" Shorthand notation; fetches https://github.com/junegunn/vim-easy-align
+"Plug 'junegunn/vim-easy-align'
+"Plug 'pangloss/vim-javascript'
+"Plug 'mxw/vim-jsx'
+
+
+" Initialize plugin system
+"call plug#end()
+

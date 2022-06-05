@@ -1,0 +1,62 @@
+- hosts: "{{ variable_hosts | default('k8s-all') }}"
+  become: yes
+  vars_files:
+    - ./vars/defaults.yml
+  tasks:
+    - name : setup_repo
+      include_tasks: includes/setup_container_repos.yml
+      when: ansible_os_family == 'Debian'
+
+    - name: install Containerd.io
+      apt:
+        name: "{{ container_package }}"
+        state: present
+        update_cache: true
+    - name: start and enable containerd
+      service:
+        name: containerd
+        state: started
+        enabled: true
+    - name: get containerd conf dir
+      file:
+        path: /etc/containerd
+        state: directory
+      register: containerd_conf_dir
+
+    - name: save containerd defaults
+      command: containerd config default
+      changed_when: false
+      register: containerd_conf_defaults
+
+    - name: debug containerd_conf_defaults
+      debug:
+        msg: "{{ containerd_conf_defaults }}"
+
+    - name: create config.toml from defaults
+      copy:
+        dest: /tmp/containerd_config.toml
+        content: "{{ containerd_conf_defaults.stdout }}"
+
+    - name: set systemd as cgroup driver
+      replace:
+        path: /tmp/containerd_config.toml
+        regexp: 'SystemdCgroup = false'
+        replace: 'SystemdCgroup = true'
+      changed_when: false 
+
+    - name: Copy config.toml to /etc/containerd
+      copy:
+        remote_src: true
+        src: /tmp/containerd_config.toml
+        dest: /etc/containerd/config.toml
+    
+    - name: Cleanup temporary file
+      file:
+        path: /tmp/containerd_config.toml
+        state: absent
+      changed_when: false
+
+    - name: restart containerd
+      service:
+        name: containerd
+        state: restarted  

@@ -1,0 +1,3 @@
+---
+# vars/defaults.yml
+container_package: containerd.io
