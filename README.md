@@ -1,4 +1,4 @@
-# IIoT k8s-controller
+# k8s-controller
 
 
 ## Cloud lab 
@@ -18,6 +18,8 @@ Change permission for key fiels in the keys folder.
 
 ### Host group
 Default host group is k8s-all. Set the --extra-vars "variable_hosts=newtargets" in ansible-playbook command to override it.
+
+Update masters and workers nodes IP, root password in inventory file ./ansible/hosts.
 
 #### Step 0 - Setup baremetal nodes
 Make sure br_netfilter kernel module is loaded. Auto loaded in playbook.
@@ -56,7 +58,7 @@ Make sure br_netfilter kernel module is loaded. Auto loaded in playbook.
 
 #### Step 3 - Test the setup
 
-     ssh admin@c2-master-01 -i ../keys/id_rsa
+     ssh admin@master -i ../keys/id_rsa
      kubectl get nodes -o wide
 
 
