@@ -16,6 +16,8 @@ Change permission for key fiels in the keys folder.
 
 ## Usage
 
+These playbooks are applied to Ubuntu 20.04 baremetals or VMs.
+
 ### Host group
 Default host group is k8s-all. Set the --extra-vars "variable_hosts=newtargets" in ansible-playbook command to override it.
 

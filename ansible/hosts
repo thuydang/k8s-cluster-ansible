@@ -1,7 +1,7 @@
 [ansible-controller]
 localhost   ansible_connection=local
 
-[k8s-01:children] # all is reserved for all hosts including localhost.
+[k8s-all:children] # all is reserved for all hosts including localhost.
 masters
 workers
 
